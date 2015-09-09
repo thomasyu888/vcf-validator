@@ -7,20 +7,34 @@ namespace opencb
   namespace vcf
   {
     
-    void ValidateOptionalPolicy::optional_check_meta_section(ParsingState const & state) const
+    std::vector<ParsingWarning> ValidateOptionalPolicy::optional_check_meta_section(ParsingState const & state) const
     {
+        std::vector<ParsingWarning> warnings;
+        
         if (state.source->meta_entries.find("reference") == state.source->meta_entries.end()) {
-          throw ParsingWarning("A valid 'reference' entry is not listed in the meta section");
+            warnings.push_back(ParsingWarning("A valid 'reference' entry is not listed in the meta section"));
         }
+        
+        return warnings;
     }
     
-    void ValidateOptionalPolicy::optional_check_body_entry(ParsingState & state, Record & record) //const
+    std::vector<ParsingWarning> ValidateOptionalPolicy::optional_check_body_entry(ParsingState & state, Record & record) //const
     {
+        std::vector<ParsingWarning> warnings;
+        
         // All samples should have the same ploidy
-        check_body_entry_ploidy(state, record);
+        try {
+            check_body_entry_ploidy(state, record);
+        } catch (ParsingWarning ex) {
+            warnings.push_back(ex);
+        }
         
         // Reference and alternate alleles in indels should share the first nucleotide
-        check_body_entry_reference_alternate_matching(state, record);
+        try {
+            check_body_entry_reference_alternate_matching(state, record);
+        } catch (ParsingWarning ex) {
+            warnings.push_back(ex);
+        }
         
         /*
          * Once some meta-data is marked as in/correct there is no need again, so all the following have been 
@@ -28,22 +42,44 @@ namespace opencb
          */
         
         // The chromosome/contig should be described in the meta section
-        check_contig_meta(state, record);
+        try {
+            check_contig_meta(state, record);
+        } catch (ParsingWarning ex) {
+            warnings.push_back(ex);
+        }
         
         // Alternate alleles of the form <SOME_ALT> should be described in the meta section
-        check_alternate_allele_meta(state, record);
+        try {
+            check_alternate_allele_meta(state, record);
+        } catch (ParsingWarning ex) {
+            warnings.push_back(ex);
+        }
         
         // Filters should be described in the meta section
-        check_filter_meta(state, record);
+        try {
+            check_filter_meta(state, record);
+        } catch (ParsingWarning ex) {
+            warnings.push_back(ex);
+        }
         
         // Info fields should be described in the meta section
-        check_info_meta(state, record);
+        try {
+            check_info_meta(state, record);
+        } catch (ParsingWarning ex) {
+            warnings.push_back(ex);
+        }
         
         // Format fields should be described in the meta section
-        check_format_meta(state, record);
+        try {
+            check_format_meta(state, record);
+        } catch (ParsingWarning ex) {
+            warnings.push_back(ex);
+        }
+        
+        return warnings;
     }
     
-    void ValidateOptionalPolicy::optional_check_body_section(ParsingState const & state) const
+    std::vector<ParsingWarning> ValidateOptionalPolicy::optional_check_body_section(ParsingState const & state) const
     {
 //        // TODO The file should be sorted
 //        if (state.records->size() > 0) {
@@ -56,6 +92,8 @@ namespace opencb
 //                                     " is listed after " + previous_record.chromosome + ":" + std::to_string(previous_record.position));
 //            }
 //        }
+        
+        return {};
     }
     
     void ValidateOptionalPolicy::check_body_entry_ploidy(ParsingState & state, Record & record)

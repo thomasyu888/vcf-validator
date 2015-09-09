@@ -218,9 +218,9 @@ namespace opencb
     class IgnoreOptionalPolicy
     {
       public:
-        void optional_check_meta_section() const {}
-        void optional_check_body_entry() {}
-        void optional_check_body_section() const {}
+        std::vector<ParsingWarning> optional_check_meta_section() const { return {}; }
+        std::vector<ParsingWarning> optional_check_body_entry() { return {}; }
+        std::vector<ParsingWarning> optional_check_body_section() const { return {}; }
     };
     
     /**
@@ -229,9 +229,9 @@ namespace opencb
     class ValidateOptionalPolicy
     {
       public:
-        void optional_check_meta_section(ParsingState const & state) const;
-        void optional_check_body_entry(ParsingState & state, Record & record) ;//const;
-        void optional_check_body_section(ParsingState const & state) const;
+        std::vector<ParsingWarning> optional_check_meta_section(ParsingState const & state) const;
+        std::vector<ParsingWarning> optional_check_body_entry(ParsingState & state, Record & record) ;//const;
+        std::vector<ParsingWarning> optional_check_body_section(ParsingState const & state) const;
         
       private:
         void check_body_entry_ploidy(ParsingState & state, Record & record);
