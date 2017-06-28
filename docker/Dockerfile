@@ -31,4 +31,4 @@ RUN for i in 1 2 3 ; do ragel -G2 -o /vcf-validator-0.5/inc/vcf/validator_detail
 RUN mkdir /vcf-validator-0.5/build
 RUN cd /vcf-validator-0.5/build && cmake -DBUILD_STATIC=1 .. && make
 
-CMD ["/vcf-validator-0.5/build/bin/vcf_validator"]
+CMD ["/vcf-validator-0.5/build/bin/vcf_validator","-i","/TESLA_VCF.vcf"]
