@@ -24,11 +24,11 @@ RUN cd /opt/libodb-sqlite-2.4.0 && ./configure --with-libodb=../libodb-2.4.0 && 
 #COPY ./entrypoint.sh /
 
 
-RUN cd / && wget https://github.com/EBIvariation/vcf-validator/archive/v0.5.tar.gz
-RUN tar -zxvf /v0.5.tar.gz
-RUN for i in 1 2 3 ; do ragel -G2 -o /vcf-validator-0.5/inc/vcf/validator_detail_v4${i}.hpp /vcf-validator-0.5/src/vcf/vcf_v4${i}.ragel ; done
+RUN cd / && wget https://github.com/EBIvariation/vcf-validator/archive/v0.6.tar.gz
+RUN tar -zxvf /v0.6.tar.gz
+RUN for i in 1 2 3 ; do ragel -G2 -o /vcf-validator-0.6/inc/vcf/validator_detail_v4${i}.hpp /vcf-validator-0.6/src/vcf/vcf_v4${i}.ragel ; done
 
-RUN mkdir /vcf-validator-0.5/build
-RUN cd /vcf-validator-0.5/build && cmake -DBUILD_STATIC=1 .. && make
+RUN mkdir /vcf-validator-0.6/build
+RUN cd /vcf-validator-0.6/build && cmake -DBUILD_STATIC=1 .. && make
 
-CMD ["/vcf-validator-0.5/build/bin/vcf_validator","-i","/TESLA_VCF.vcf"]
+CMD ["/vcf-validator-0.6/build/bin/vcf_validator","-i","/TESLA_VCF.vcf"]
