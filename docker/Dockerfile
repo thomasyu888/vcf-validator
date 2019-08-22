@@ -1,6 +1,6 @@
-FROM ubuntu:xenial
+FROM debian:stretch-slim
 
-RUN apt-get update -y && apt-get upgrade -y && apt-get install -y \
+RUN apt-get update -y && apt-get install -y --no-install-recommends \
 g++ \
 make \
 cmake \
@@ -29,17 +29,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends wget bzip2 \
 && cd libodb-2.4.0 && ./configure && make && make install && cd .. \
 && cd libodb-sqlite-2.4.0 && ./configure --with-libodb=../libodb-2.4.0 && make && make install && cd .. \
 # Clean up to reduce layer size
-&& apt-get clean \
-&& rm -rf /opt /var/lib/apt/lists/* /usr/share/doc /usr/share/doc-bases
-
+&& apt-get clean && apt-get remove --purge -y bzip2 \
+&& rm -rf /opt /var/lib/apt/lists/* /usr/share/doc /usr/share/doc-base
 #COPY ./entrypoint.sh /
 
+WORKDIR /
+RUN wget --no-check-certificate https://github.com/EBIvariation/vcf-validator/archive/v0.9.2.tar.gz
+RUN tar -zxvf /v0.9.2.tar.gz
+RUN for i in 1 2 3 ; do ragel -G2 -o /vcf-validator-0.9.2/inc/vcf/validator_detail_v4${i}.hpp /vcf-validator-0.9.2/src/vcf/vcf_v4${i}.ragel ; done
 
-RUN cd / && wget https://github.com/EBIvariation/vcf-validator/archive/v0.8.tar.gz
-RUN tar -zxvf /v0.8.tar.gz
-RUN for i in 1 2 3 ; do ragel -G2 -o /vcf-validator-0.8/inc/vcf/validator_detail_v4${i}.hpp /vcf-validator-0.8/src/vcf/vcf_v4${i}.ragel ; done
+RUN mkdir /vcf-validator-0.9.2/build
+RUN cd /vcf-validator-0.9.2/build && cmake -DBUILD_STATIC=1 .. && make
 
-RUN mkdir /vcf-validator-0.8/build
-RUN cd /vcf-validator-0.8/build && cmake -DBUILD_STATIC=1 .. && make
-
-CMD ["/vcf-validator-0.8/build/bin/vcf_validator","-i","/TESLA_VCF.vcf"]
+CMD ["/vcf-validator-0.9.2/build/bin/vcf_validator","-i","/TESLA_VCF.vcf"]
